@@ -4,31 +4,39 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 // Change code below this line
-const galleryContainer = document.querySelector('.gallery');
+const galleryRef = document.querySelector('.gallery');
 
-galleryContainer.innerHTML = createGalleryMarkup(galleryItems);
+galleryItems.map(({ preview, original, description }) => {
+  const liEl = `<li class="gallery__item">
+  <a class="gallery__link" href="${original}">
+    <img
+      class="gallery__image"
+      src="${preview}"
+      data-source="${original}"
+      alt="${description}"
+    />
+  </a>
+</li>`
+  galleryRef.innerHTML += liEl;
+})
 
-const lightbox = new SimpleLightbox('.gallery li a', {
-  captionsData: 'alt',
-  captionPosition: 'bottom',
-  captionDelay: 250,
-});
+galleryRef.addEventListener('click', onClickImg);
 
-galleryContainer.addEventListener('click', (event) => {
-  event.preventDefault();
-  lightbox.open();
-});
-
-function createGalleryMarkup(data) {
-  return data
-    .map(({ preview, original, description }) => {
-      return `<li class="gallery__item">
-                <a href="${original}">
-                  <img class="gallery__image" src="${preview}" alt="${description}" />
-                </a>
-              </li>`;
-    })
-    .join('');
-}
-
+function onClickImg(event) {
+  event.preventDefault()
+  if (event.target.nodeName !== 'IMG') {
+    return
+  }
+  const instance = basicLightbox.create(`
+    <img src="${event.target.dataset.source}" width="800" height="600">
+`);
+  instance.show();
+  galleryRef.addEventListener('keydown', onClickModalClose);
+  
+  function onClickModalClose(event) {
+    if (event.code === "Escape") {
+      instance.close()
+    } 
+  };
+};
 console.log(galleryItems);
