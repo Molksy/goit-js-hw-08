@@ -2,41 +2,26 @@
 import { galleryItems } from './gallery-items';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-
 // Change code below this line
-const galleryRef = document.querySelector('.gallery');
 
-galleryItems.map(({ preview, original, description }) => {
-  const liEl = `<li class="gallery__item">
-  <a class="gallery__link" href="${original}">
-    <img
-      class="gallery__image"
-      src="${preview}"
-      data-source="${original}"
-      alt="${description}"
-    />
-  </a>
-</li>`
-  galleryRef.innerHTML += liEl;
-})
+const galleryContainer = document.querySelector('.gallery');
 
-galleryRef.addEventListener('click', onClickImg);
+galleryContainer.innerHTML = createGalleryMarkup(galleryItems);
 
-function onClickImg(event) {
-  event.preventDefault()
-  if (event.target.nodeName !== 'IMG') {
-    return
-  }
-  const instance = basicLightbox.create(`
-    <img src="${event.target.dataset.source}" width="800" height="600">
-`);
-  instance.show();
-  galleryRef.addEventListener('keydown', onClickModalClose);
-  
-  function onClickModalClose(event) {
-    if (event.code === "Escape") {
-      instance.close()
-    } 
-  };
-};
-console.log(galleryItems);
+const lightbox = new SimpleLightbox('.gallery > li > a', {
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
+});
+
+function createGalleryMarkup(data) {
+  return data
+    .map(({ preview, original, description }) => {
+      return `<li>
+                        <a class="gallery__item" href="${original}">
+                            <img class="gallery__image" src="${preview}" alt="${description}" />
+                        </a>
+                    </li>`;
+    })
+    .join('');
+}
